@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  HostParam,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, FindOneParams } from './dto/create-user.dto';
