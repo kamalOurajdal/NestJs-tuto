@@ -1,4 +1,10 @@
-import { IsString, IsNotEmpty, IsNumber, IsBoolean, IsOptional } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+} from 'class-validator';
 
 export class CreateUserDto {
   @IsString()
@@ -10,13 +16,12 @@ export class CreateUserDto {
   age: number;
 
   @IsBoolean()
-  @IsOptional() 
+  @IsOptional()
   isActive?: boolean;
 }
 
-
 export class FindOneParams {
-    @IsString()
-    @IsNotEmpty()
-    id: string;
+  @IsString()
+  @IsNotEmpty()
+  id: string;
 }
