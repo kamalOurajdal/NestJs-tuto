@@ -2,36 +2,36 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
-import { Request } from 'express';
-
+import type { Request } from 'express';
+import AUTH_COOKIE_NAMES from '../constants/auth.constant';
 import { TokenType } from '../models/token-type.enum';
 import { AuthJwtUser } from '../models/auth-jwt-user.interface';
-import { CookiesService } from '../../../common/security/cookies.service';
-import AUTH_COOKIE_NAMES from '../constants/auth.constant';
+import { CookiesService } from 'src/common/security/cookies.service';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class RefreshJwtStrategy extends PassportStrategy(
+  Strategy,
+  'jwt-refresh',
+) {
   constructor(
     configService: ConfigService,
     private readonly cookiesService: CookiesService,
   ) {
-    const jwtSecret = configService.getOrThrow<string>('jwtSecret');
-
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
         (request: Request) => {
           return (
-            this.cookiesService.get(request, AUTH_COOKIE_NAMES.ACCESS) ?? null
+            this.cookiesService.get(request, AUTH_COOKIE_NAMES.REFRESH) ?? null
           );
         },
       ]),
       ignoreExpiration: false,
-      secretOrKey: jwtSecret,
+      secretOrKey: configService.getOrThrow<string>('jwtSecret'),
     });
   }
 
   validate(payload: AuthJwtUser): AuthJwtUser {
-    if (!this.isSupportedTokenType(payload.tokenType)) {
+    if (payload.tokenType !== TokenType.REFRESH) {
       throw new UnauthorizedException('Invalid token type');
     }
 
@@ -40,9 +40,5 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       jti: payload.jti,
       tokenType: payload.tokenType,
     };
-  }
-
-  private isSupportedTokenType(tokenType: TokenType): boolean {
-    return [TokenType.ACCESS, TokenType.CHANGE_PASSWORD].includes(tokenType);
   }
 }
