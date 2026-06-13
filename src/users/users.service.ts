@@ -8,7 +8,10 @@ import * as bcrypt from 'bcrypt';
 
 const BCRYPT_ROUNDS = 12;
 
-export type UserAuthRecord = Pick<User, '_id' | 'email' | 'name' | 'age' | 'isActive'> & {
+export type UserAuthRecord = Pick<
+  User,
+  '_id' | 'email' | 'name' | 'age' | 'isActive'
+> & {
   passwordHash: string;
 };
 
@@ -44,6 +47,9 @@ export class UsersService {
   }
 
   async findOne(id: string): Promise<User | null> {
+    return await this.userModel.findById(id);
+  }
+  async findById(id: string): Promise<User | null> {
     return await this.userModel.findById(id);
   }
 
